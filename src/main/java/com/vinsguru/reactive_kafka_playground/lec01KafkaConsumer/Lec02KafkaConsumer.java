@@ -9,10 +9,11 @@ import reactor.kafka.receiver.ReceiverOptions;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
-public class Lec01KafkaConsumer {
+public class Lec02KafkaConsumer {
 
-    private static final Logger log = LoggerFactory.getLogger(Lec01KafkaConsumer.class);
+    private static final Logger log = LoggerFactory.getLogger(Lec02KafkaConsumer.class);
 
     public static void main(String[] args) {
 
@@ -20,14 +21,14 @@ public class Lec01KafkaConsumer {
                     ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092",
                     ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
                     ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
-                    ConsumerConfig.GROUP_ID_CONFIG, "demo-group",
+                    ConsumerConfig.GROUP_ID_CONFIG, "inventory-service-group",
                     ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest",
                     ConsumerConfig.GROUP_INSTANCE_ID_CONFIG, "1"
-            )).subscription(List.of("order-events"));
+            )).subscription(Pattern.compile("order.*"));
 
         KafkaReceiver.create(options)
                 .receive()
-                .doOnNext(r -> log.info("key: {}, value: {}", r.key(), r.value()))
+                .doOnNext(r -> log.info("topic: {}, key: {}, value: {}", r.topic(), r.key(), r.value()))
                 .doOnNext(r -> r.receiverOffset().acknowledge())
                 .subscribe();
     }
