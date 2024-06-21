@@ -1,10 +1,8 @@
-package com.vinsguru.reactive_kafka_playground.lec02KafkaProducer;
+package com.vinsguru.reactive_kafka_playground.sec04;
 
-import com.vinsguru.reactive_kafka_playground.lec01KafkaConsumer.Lec02KafkaConsumer;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +11,6 @@ import reactor.kafka.sender.KafkaSender;
 import reactor.kafka.sender.SenderOptions;
 import reactor.kafka.sender.SenderRecord;
 
-import java.time.Duration;
 import java.util.Map;
 
 public class KafkaProducer {
@@ -30,15 +27,20 @@ public class KafkaProducer {
 //                ProducerConfig.GROUP_INSTANCE_ID_CONFIG, "1"
         ));
 
-        var flux = Flux.interval(Duration.ofMillis(100))
-                        .take(100)
-                        .map(i -> new ProducerRecord<>("order-events", i.toString(), "order-" + i))
-                        .map(pr -> SenderRecord.create(pr, pr.key()));
+        var flux = Flux.range(1,10).map(KafkaProducer::createSenderRecord);
 
         var sender = KafkaSender.<String, String>create(options);
                 sender.send(flux)
                 .doOnNext(r -> log.info("correlation id: {}", r.correlationMetadata()))
                 .doOnComplete(sender::close) //cierra la conexion con kafka
                 .subscribe();
+    }
+
+    public static SenderRecord<String, String, String> createSenderRecord(Integer i) {
+        var headers = new RecordHeaders();
+        headers.add("client-id", "some-client".getBytes());
+        headers.add("tracing-id", "123".getBytes());
+        var pr = new ProducerRecord<>("order-events", null, i.toString(), "order-" + i, headers);
+        return SenderRecord.create(pr, pr.key());
     }
 }

@@ -1,10 +1,7 @@
-package com.vinsguru.reactive_kafka_playground.lec02KafkaProducer;
+package com.vinsguru.reactive_kafka_playground.sec03;
 
-import com.vinsguru.reactive_kafka_playground.lec01KafkaConsumer.Lec02KafkaConsumer;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +25,9 @@ public class KafkaProducer {
 //                ProducerConfig.GROUP_ID_CONFIG, "inventory-service-group",
 //                ProducerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest",
 //                ProducerConfig.GROUP_INSTANCE_ID_CONFIG, "1"
-        ));
+        )).maxInFlight(10_000);
 
-        var flux = Flux.interval(Duration.ofMillis(100))
-                        .take(100)
+        var flux = Flux.range(1, 1_000_000)
                         .map(i -> new ProducerRecord<>("order-events", i.toString(), "order-" + i))
                         .map(pr -> SenderRecord.create(pr, pr.key()));
 
