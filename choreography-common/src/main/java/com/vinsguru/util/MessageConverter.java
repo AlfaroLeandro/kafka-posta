@@ -1,4 +1,4 @@
-package com.vinsguru.common.util;
+package com.vinsguru.util;
 
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
