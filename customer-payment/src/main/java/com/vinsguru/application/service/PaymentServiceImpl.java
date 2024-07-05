@@ -1,6 +1,7 @@
 package com.vinsguru.application.service;
 
 import com.vinsguru.application.entity.Customer;
+import com.vinsguru.application.entity.CustomerPayment;
 import com.vinsguru.application.mapper.EntityDTOMapper;
 import com.vinsguru.application.repository.CustomerRepository;
 import com.vinsguru.application.repository.PaymentRepository;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -33,6 +35,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 
     @Override
+    @Transactional
     public Mono<PaymentDTO> process(PaymentProcessRequest request) {
         return DuplicateEventValidator.validate(
                 this.paymentRepository.existsByOrderId(request.orderId()),
@@ -54,7 +57,19 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public Mono<PaymentDTO> refund(UUID orderId) {
-        return null;
+        return this.paymentRepository.findByOrderIdAndStatus(orderId, PaymentStatus.DEDUCTED)
+                .zipWhen(cp -> this.customerRepository.findById(cp.getCustomerId()))
+                .flatMap(t -> this.refundPayment(t.getT1(), t.getT2()))
+                .doOnNext(dto -> log.info("refund amount {} for {}: ", dto.amount(), dto.orderId()));
+    }
+
+    private Mono<PaymentDTO> refundPayment(CustomerPayment customerPayment, Customer customer) {
+        customer.setBalance(customer.getBalance() + customerPayment.getAmount());
+        customerPayment.setStatus(PaymentStatus.REFUNDED);
+        return this.customerRepository.save(customer)
+                .then(this.paymentRepository.save(customerPayment))
+                .map(EntityDTOMapper::toDto);
     }
 }

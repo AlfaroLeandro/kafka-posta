@@ -1,6 +1,7 @@
 package com.vinsguru.application.repository;
 
 import com.vinsguru.application.entity.CustomerPayment;
+import com.vinsguru.common.events.payment.PaymentStatus;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
@@ -11,5 +12,7 @@ import java.util.UUID;
 public interface PaymentRepository extends ReactiveCrudRepository<CustomerPayment, UUID> {
 
     Mono<Boolean> existsByOrderId(UUID orderId);
+
+    Mono<CustomerPayment> findByOrderIdAndStatus(UUID orderId, PaymentStatus status);
 
 }
