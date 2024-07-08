@@ -1,7 +1,7 @@
-package com.vinsguru.common.service;
+package com.vinsguru.payment.common.service;
 
-import com.vinsguru.common.dto.PaymentDTO;
-import com.vinsguru.common.dto.PaymentProcessRequest;
+import com.vinsguru.payment.common.dto.PaymentDTO;
+import com.vinsguru.payment.common.dto.PaymentProcessRequest;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;

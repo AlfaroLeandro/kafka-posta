@@ -1,16 +1,16 @@
-package com.vinsguru.application.service;
+package com.vinsguru.payment.application.service;
 
-import com.vinsguru.application.entity.Customer;
-import com.vinsguru.application.entity.CustomerPayment;
-import com.vinsguru.application.mapper.EntityDTOMapper;
-import com.vinsguru.application.repository.CustomerRepository;
-import com.vinsguru.application.repository.PaymentRepository;
-import com.vinsguru.common.dto.PaymentDTO;
-import com.vinsguru.common.dto.PaymentProcessRequest;
+import com.vinsguru.payment.application.entity.Customer;
+import com.vinsguru.payment.application.entity.CustomerPayment;
+import com.vinsguru.payment.application.mapper.EntityDTOMapper;
+import com.vinsguru.payment.application.repository.CustomerRepository;
+import com.vinsguru.payment.application.repository.PaymentRepository;
+import com.vinsguru.payment.common.dto.PaymentDTO;
+import com.vinsguru.payment.common.dto.PaymentProcessRequest;
 import com.vinsguru.common.events.payment.PaymentStatus;
-import com.vinsguru.common.exception.CustomerNotFoundException;
-import com.vinsguru.common.exception.InsufficientBalanceException;
-import com.vinsguru.common.service.PaymentService;
+import com.vinsguru.payment.common.exception.CustomerNotFoundException;
+import com.vinsguru.payment.common.exception.InsufficientBalanceException;
+import com.vinsguru.payment.common.service.PaymentService;
 import com.vinsguru.util.DuplicateEventValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +48,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .doOnNext(dto -> log.info("payment processed for {}: ", dto.orderId()));
     }
 
+    @Transactional
     private  Mono<PaymentDTO> deductPayment(Customer customer, PaymentProcessRequest request) {
         var customerPayment = EntityDTOMapper.toCustomerPayment(request);
         customerPayment.setStatus(PaymentStatus.DEDUCTED);
@@ -65,6 +66,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .doOnNext(dto -> log.info("refund amount {} for {}: ", dto.amount(), dto.orderId()));
     }
 
+    @Transactional
     private Mono<PaymentDTO> refundPayment(CustomerPayment customerPayment, Customer customer) {
         customer.setBalance(customer.getBalance() + customerPayment.getAmount());
         customerPayment.setStatus(PaymentStatus.REFUNDED);

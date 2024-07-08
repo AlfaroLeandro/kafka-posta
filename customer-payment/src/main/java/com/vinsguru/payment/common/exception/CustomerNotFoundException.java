@@ -1,4 +1,4 @@
-package com.vinsguru.common.exception;
+package com.vinsguru.payment.common.exception;
 
 public class CustomerNotFoundException extends RuntimeException{
 

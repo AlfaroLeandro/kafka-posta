@@ -1,4 +1,4 @@
-package com.vinsguru.application.entity;
+package com.vinsguru.payment.application.entity;
 
 import com.vinsguru.common.events.payment.PaymentStatus;
 import org.springframework.data.annotation.Id;

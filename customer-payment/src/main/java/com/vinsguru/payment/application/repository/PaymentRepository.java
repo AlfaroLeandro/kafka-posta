@@ -1,6 +1,6 @@
-package com.vinsguru.application.repository;
+package com.vinsguru.payment.application.repository;
 
-import com.vinsguru.application.entity.CustomerPayment;
+import com.vinsguru.payment.application.entity.CustomerPayment;
 import com.vinsguru.common.events.payment.PaymentStatus;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;

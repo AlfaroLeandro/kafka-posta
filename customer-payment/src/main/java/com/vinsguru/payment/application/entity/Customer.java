@@ -1,4 +1,4 @@
-package com.vinsguru.application.entity;
+package com.vinsguru.payment.application.entity;
 
 import org.springframework.data.annotation.Id;
 

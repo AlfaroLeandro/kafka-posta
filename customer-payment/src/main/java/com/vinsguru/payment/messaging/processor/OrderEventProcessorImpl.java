@@ -1,17 +1,16 @@
-package com.vinsguru.messaging.processor;
+package com.vinsguru.payment.messaging.processor;
 
 import com.vinsguru.common.events.order.OrderEvent;
 import com.vinsguru.common.events.payment.PaymentEvent;
-import com.vinsguru.common.exception.CustomerNotFoundException;
+import com.vinsguru.payment.common.exception.CustomerNotFoundException;
 import com.vinsguru.common.exception.EventAlreadyProcessedException;
-import com.vinsguru.common.exception.InsufficientBalanceException;
+import com.vinsguru.payment.common.exception.InsufficientBalanceException;
 import com.vinsguru.common.processor.OrderEventProcessor;
-import com.vinsguru.common.service.PaymentService;
-import com.vinsguru.messaging.mapper.MessageDTOMapper;
+import com.vinsguru.payment.common.service.PaymentService;
+import com.vinsguru.payment.messaging.mapper.MessageDTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -33,12 +32,15 @@ public class OrderEventProcessorImpl implements OrderEventProcessor<PaymentEvent
 
     @Override
     public Mono<PaymentEvent> handle(OrderEvent.Canceled e) {
-        return this.service.refund(e.orderId());
+        return this.service.refund(e.orderId())
+                .map(MessageDTOMapper::toPaymentRefundedEvent)
+                .doOnNext(e1 -> log.info("refund procesed {}", e1))
+                .doOnError(ex -> log.error("error while processing refund: {}", ex.getMessage()));
     }
 
     @Override
     public Mono<PaymentEvent> handle(OrderEvent.Completed e) {
-        return null;
+        return Mono.empty();
     }
 
     private UnaryOperator<Mono<PaymentEvent>> exceptionHandler(OrderEvent.Created event) {

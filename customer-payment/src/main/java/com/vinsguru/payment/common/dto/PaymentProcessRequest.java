@@ -1,4 +1,4 @@
-package com.vinsguru.common.dto;
+package com.vinsguru.payment.common.dto;
 
 import java.util.UUID;
 

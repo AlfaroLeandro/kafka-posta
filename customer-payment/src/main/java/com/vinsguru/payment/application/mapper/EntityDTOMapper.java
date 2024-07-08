@@ -1,8 +1,8 @@
-package com.vinsguru.application.mapper;
+package com.vinsguru.payment.application.mapper;
 
-import com.vinsguru.application.entity.CustomerPayment;
-import com.vinsguru.common.dto.PaymentDTO;
-import com.vinsguru.common.dto.PaymentProcessRequest;
+import com.vinsguru.payment.application.entity.CustomerPayment;
+import com.vinsguru.payment.common.dto.PaymentDTO;
+import com.vinsguru.payment.common.dto.PaymentProcessRequest;
 
 public class EntityDTOMapper {
 
