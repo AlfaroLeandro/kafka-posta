@@ -3,7 +3,6 @@ spring:
     function:
       definition: processor
     stream:
-      defaultBinder: kafka
       default:
         producer:
           useNativeEncoding: true
@@ -23,3 +22,14 @@ spring:
           producer-properties:
             "value.serializer": org.springframework.kafka.support.serializer.JsonSerializer
             "key.serializer": org.apache.kafka.common.serialization.StringSerializer
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          stream:
+            binder:
+              kafka: DEBUG
+        integration: DEBUG
+        messaging: DEBUG
+        kafka: DEBUG
